@@ -6,9 +6,11 @@ The apps script currently ignores adding new rows if the profile link already ex
 I started building a smarter system to add the person again if they view the profile multiple times, but it is not ready.
 Also, be sure to delete these comments before converting to a bookmarklet. 
 /*/
-var webAppURL = "yourappURLgoesHere";
 
-var prodElm = parseInt(grouped(/^(.+?)\s*profile/.exec(document.getElementsByClassName("me-wvmp-views__profile-views Sans-13px-black-55% pr5")[0].innerText), 1));
+console.log("Starting the linkedin processing");
+var webAppURL = "https://script.google.com/macros/s/AKfycbxShr_wPAksJR2s_F8EMephlNcMDjlfKjArxWxQsvcDAd9E7qT0/exec";
+
+var prodElm =  100;
 
 var numScrollEventsNeeded = Math.round((prodElm - 6) / 9);
 
@@ -20,6 +22,7 @@ function timedScroller(num) {
 }
 
 for (i = 0; i < numScrollEventsNeeded; i++) {
+  console.log("Time scroller cycle " + i);
   timedScroller(i * 1000);
 }
 
@@ -62,24 +65,30 @@ function clearOut(str) {
 }
 
 setTimeout(() => {
-  var profContainer = document.getElementsByTagName("article");
+  console.log("Setting timeout " + i);
+  var profContainer = document.getElementsByClassName("me-wvmp-viewer-card display-flex ember-view");
+
+  console.log("Nb containers found " + profContainer.length);
+
   var dataArray = [];
 
   for (i = 1; i < (profContainer.length - 1); i++) {
+
+   console.log("Processing the container " + i);
 
     var profLink = grouped(/linkedin\.com\/in\/(.+?)(?=\/|$)/.exec(validate(profContainer[i].getElementsByTagName("a"), 0, "href")), 1);
 
     var seen = validate(profContainer[i].getElementsByClassName("me-wvmp-viewer-card__time-ago"), 0, "innerText");
 
-    var name = validate(validate(profContainer[i].getElementsByTagName("h2"), 0, 'next').getElementsByTagName("span"), 0, "innerText");
+    var name = validate(profContainer[i].getElementsByClassName("me-wvmp-viewer-card__name-text"), 0, "innerText");
 
-    var dist = validate(validate(profContainer[i].getElementsByTagName("h2"), 0, 'next').getElementsByTagName("span"), 1, "innerText");
+    var dist = validate(profContainer[i].getElementsByClassName("distance-badge"), 0, "innerText");
 
     var work = validate(profContainer[i].getElementsByClassName("me-wvmp-viewer-card__viewer-headline"), 0, "innerText");
 
     var foundVia = validate(profContainer[i].getElementsByClassName("me-wvmp-viewer-card__found-via"), 0, "innerText");
     if (work == undefined) {
-      work = validate(validate(profContainer[i].getElementsByTagName("h2"), 0, 'next').getElementsByTagName("p"), 0, 'innerText');
+      work = validate(profContainer[i].getElementsByClassName("me-wvmp-viewer-card__viewer-headline"), 0, "innerText");
     }
     dataArray.push('["' + profLink + '","' + clearOut(name) + '","' + clearOut(work) + '","' + clearOut(seen) + '","' + clearOut(dist) + '","' + clearOut(foundVia).replace(/Found you via /, '') + '"]');
 
